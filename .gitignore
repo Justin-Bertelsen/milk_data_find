@@ -50,3 +50,9 @@ rsconnect/
 
 # CSV data files
 *.csv
+
+# Naming convention for working data files
+*_draft.csv
+*_scratch.csv
+*_tmp.csv
+*_backup.csv
