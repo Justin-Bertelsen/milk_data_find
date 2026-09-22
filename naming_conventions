@@ -1,1 +1,158 @@
+# Naming Conventions for milk_data_find
 
+These rules govern all data files, column names, and identifiers in this project so that records are consistent, machine-readable, and easy to join across datasets.
+
+## 1. General format
+- Use lowercase only.
+- Use snake_case for all column names and file names.
+- Use only letters, numbers, and underscores.
+- Do not use spaces, hyphens, slashes, or special characters in names.
+- Keep names short but descriptive.
+- Prefer nouns and measurable variables over vague labels.
+
+Examples:
+- good: cow_id, milk_yield_kg, recording_date
+- avoid: CowID, Milk Yield, recording-date, milk_yield(kg)
+
+## 2. Identifier conventions
+- Use _id suffix for unique keys.
+- Use the form entity_id, not mixed naming.
+- If the identifier is a tag number, use tag_id or cow_tag_id.
+- If the identifier is a herd or farm, use herd_id.
+- Use record_id for a row-level unique key when no natural key exists.
+
+Examples:
+- cow_id
+- herd_id
+- tag_id
+- record_id
+
+## 3. Date and time conventions
+- Store dates in ISO 8601 format: YYYY-MM-DD.
+- Store datetimes in ISO 8601 format: YYYY-MM-DDTHH:MM:SS.
+- Use date names that clearly communicate the event type.
+- Use a single naming pattern for all time fields.
+
+Examples:
+- calving_date
+- recording_date
+- test_date
+- milk_collection_time
+
+## 4. Measurement conventions
+- Use the measurement name first, then the unit second.
+- Use units in standard lowercase forms.
+- Prefer decimal values for continuous measurements.
+- Use consistent naming across all tables.
+
+Examples:
+- milk_yield_kg
+- fat_pct
+- protein_pct
+- lactose_pct
+- somatic_cell_count
+- days_in_milk
+- body_condition_score
+
+Rules:
+- Percent variables should end with _pct.
+- Weight/volume variables should end with _kg, _l, or another standard unit.
+- Counts should end with _count or a clear count-based label.
+
+## 5. Cow and animal metadata
+Use consistent names for all animal-related fields.
+
+Examples:
+- cow_id
+- breed
+- lactation_number
+- parity
+- age_months
+- herd_id
+- sire_id
+- dam_id
+
+For lactation fields:
+- lactation_number
+- days_in_milk
+- days_pregnant
+- calving_date
+
+## 6. Milk production variables
+Use the following standard names when possible:
+- milk_yield_kg
+- fat_pct
+- protein_pct
+- lactose_pct
+- milk_solids_kg
+- somatic_cell_count
+- conductivity
+- temperature_c
+
+If a measurement is a daily total, include the time period in the name.
+Examples:
+- daily_milk_yield_kg
+- monthly_milk_yield_kg
+- test_day_milk_yield_kg
+
+## 7. Missing data conventions
+- Missing values must be represented consistently.
+- Use NA in analysis-ready files when possible.
+- Do not mix blank strings, null-like text, and numeric placeholders for the same meaning.
+- Avoid using words like "missing", "unknown", or "n/a" in raw data fields unless required by the original source.
+
+Standard approach:
+- Keep raw source values as given where possible.
+- Convert missing values to NA in cleaned datasets.
+
+## 8. File naming conventions
+- Use lowercase snake_case for file names.
+- Use descriptive names that reflect the file content.
+- Use one naming pattern for related files.
+
+Examples:
+- raw_cow_data.csv
+- cleaned_milk_data.csv
+- herd_metadata.csv
+- milk_yield_summary.csv
+
+## 9. Table and column naming patterns
+Use consistent patterns: subject + property + unit + context
+
+Examples:
+- cow_id
+- herd_id
+- cow_breed
+- calving_date
+- daily_milk_yield_kg
+- test_day_fat_pct
+
+Avoid ambiguous names such as:
+- value
+- data
+- info
+- x1
+- y2
+- temp
+
+## 10. Standard naming examples for this project
+These are the preferred names for the main data fields in this repository:
+- cow_id
+- herd_id
+- tag_id
+- recording_date
+- milk_yield_kg
+- fat_pct
+- protein_pct
+- lactose_pct
+- somatic_cell_count
+- days_in_milk
+- parity
+- lactation_number
+- breed
+- calving_date
+
+## 11. Enforcement rule
+All new dataset columns and scripts must follow these naming rules. If a source file uses inconsistent names, they should be standardized before analysis.
+
+This project should treat naming consistency as a required data quality rule, not a suggestion.
