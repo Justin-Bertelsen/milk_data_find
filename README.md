@@ -119,16 +119,6 @@ For each delivered dataset, I plan to record:
 
 This will let us explain why a particular ID was assigned and rerun the process when new data arrives.
 
-## Questions for Wednesday
-
-- Which fields are trusted enough to use as matching evidence?
-- Are there known changes in equipment, herd composition, or collection procedures over time?
-- Should false matches or unresolved records be treated as more costly?
-- How much manual review is practical?
-- Do we have enough known, correctly tagged records to create representative validation sets?
-- Is the intended output a single best ID, a ranked list of candidates, or a confidence-based review queue?
-- Should the initial implementation remain local, or are collaboration and data volume reasons to move to the cloud?
-
 ## Initial success criteria
 
 The project will be considered successful when it produces a documented and repeatable workflow that:
