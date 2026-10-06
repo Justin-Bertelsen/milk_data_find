@@ -603,10 +603,10 @@
             <li><strong>Preserved AnimalId as text</strong> so large identifier values were not treated as measurements.</li>
             <li><strong>Standardized types:</strong> coerced numeric fields to numeric, parsed EventDate as a date, and trimmed ReproductionStatus; blank text was marked missing.</li>
             <li><strong>Removed exact duplicates only:</strong> rows had to match in every column; repeated AnimalId values were expected and retained.</li>
-            <li><strong>Checked impossible values:</strong> nonpositive lactation/milking numbers and negative days, flows, yields, or duration. The audit found <strong>0 violations</strong>, so 0 rows were removed by these rules.</li>
+            <li><strong>Checked impossible values:</strong> nonpositive lactation/milking numbers and negative days, flows, yields, or duration. The audit found <strong>0 violations</strong>, so 0 row[...]</li>
             <li><strong>Reviewed duplicate-like session keys</strong> (same cow/date/milking) but kept them for review rather than deleting records on a partial key.</li>
           </ol>
-          <div class="callout"><strong>Outlier and missing-data policy:</strong> the recorded cleaning run does not show statistical outlier trimming or imputation. The 1,696,870 rows with missing AnimalId were retained separately; an unknown cow ID is not a zero or a safe value to invent.</div>
+          <div class="callout"><strong>Outlier and missing-data policy:</strong> the recorded cleaning run does not show statistical outlier trimming or imputation. The 1,696,870 rows with missing Ani[...]</div>
         </article>
 
         <article class="card no-break">
@@ -630,7 +630,7 @@
       <div class="column">
         <article class="card no-break">
           <h2>3 · Split without cow leakage</h2>
-          <p>All sessions from one known cow stayed together in the primary train/test partition. This prevents the same cow from appearing in both partitions when testing behavior-group generalization.</p>
+          <p>All sessions from one known cow stayed together in the primary train/test partition. This prevents the same cow from appearing in both partitions when testing behavior-group generalizatio[...]</p>
           <div class="split-tile">
             <div><strong>80% · 7,270 cows</strong><span>training IDs · 5,396,948 rows</span></div>
             <div><strong>20% · 1,817 cows</strong><span>held-out IDs · 1,340,950 rows</span></div>
@@ -640,24 +640,24 @@
             <li>Confirmed <strong>0 shared cow IDs</strong> between train and test.</li>
             <li>Kept the <strong>1,696,870 missing-ID rows</strong> as a separate inference pool, not as training labels.</li>
           </ul>
-          <div class="callout"><strong>A second split served the matching task:</strong> within known cows, session keys were deterministically hashed and roughly 1-in-5 sessions held out as queries; the other sessions formed the cow profile/gallery. Gallery and query sessions were distinct.</div>
+          <div class="callout"><strong>A second split served the matching task:</strong> within known cows, session keys were deterministically hashed and roughly 1-in-5 sessions held out as queries; [...]</div>
         </article>
 
         <article class="card success no-break">
           <h2>Success · Broad behavior groups</h2>
-          <p>This is a <strong>3-class behavior classification</strong> task, not exact cow identification. Three cow groups were described using mean milk flow, session yield, and duration; KNN used those session measurements.</p>
+          <p>This is a <strong>3-class behavior classification</strong> task, not exact cow identification. Three cow groups were described using mean milk flow, session yield, and duration; KNN used [...]</p>
           <div>
             <span class="result-badge">k = 9 selected</span>
             <span class="result-badge">66.51% test accuracy</span>
             <span class="result-badge">62.72% balanced accuracy</span>
           </div>
           <p>The held-out majority-class baseline was <strong>43.38%</strong>. The KNN improved on it; class-level F1 ranged from 0.47 to 0.74, showing the groups were not equally easy to recognize.</p>
-          <p class="chart-note">k was selected by inner validation (tested 1, 3, 5, 9); k=9 led with 68% accuracy / 64% balanced accuracy there. Final held-out evaluation used 8,907 sampled sessions from 1,807 cows.</p>
+          <p class="chart-note">k was selected by inner validation (tested 1, 3, 5, 9); k=9 led with 68% accuracy / 64% balanced accuracy there. Final held-out evaluation used 8,907 sampled sessions f[...]</p>
         </article>
 
         <article class="card caution no-break">
           <h2>What the split lets us claim</h2>
-          <p>The cow-level holdout supports evaluation of broad behavior groups on cows not used to fit group centers. The individual-ID retrieval tests answer a different question: can a session match one of the cows that already has a labeled history?</p>
+          <p>The cow-level holdout supports evaluation of broad behavior groups on cows not used to fit group centers. The individual-ID retrieval tests answer a different question: can a session matc[...]</p>
           <p><strong>Neither task validates the true IDs of the missing-ID records</strong>, because those labels are unavailable for scoring.</p>
         </article>
       </div>
@@ -665,7 +665,7 @@
       <div class="column">
         <article class="card no-break">
           <h2>4 · Predicting an exact AnimalId</h2>
-          <p>Nearest-neighbor retrieval compares a query session with known cow profiles/sessions. Exact accuracy means the top-ranked candidate ID is correct; top-five means the true cow appears among five distinct candidates.</p>
+          <p>Nearest-neighbor retrieval compares a query session with known cow profiles/sessions. Exact accuracy means the top-ranked candidate ID is correct; top-five means the true cow appears amon[...]</p>
           <p><span class="tag">8 numeric session features</span> lactation, days in milk, two flow measures, early and total yield, duration, and milking number.</p>
           <ul>
             <li>Standardized measurements so large-unit features would not dominate distance.</li>
@@ -693,7 +693,7 @@
       <div class="wide-grid">
         <div>
           <p class="chart-title">Exact ID retrieval on the larger query sample</p>
-          <p class="chart-note">The sequence below tracks the notebook's fixed-distance experiments on the same query sample (35,582 sessions; up to five query sessions per cow). Gallery and feature additions are cumulative where shown.</p>
+          <p class="chart-note">The sequence below tracks the notebook's fixed-distance experiments on the same query sample (35,582 sessions; up to five query sessions per cow). Gallery and feature a[...]</p>
           <div class="bar-row"><span class="bar-label">Single-session profile · baseline</span><div class="bar-track"><div class="bar" style="width:7.1%"></div></div><span class="bar-value">0.79%</span></div>
           <div class="bar-row"><span class="bar-label">All features · Manhattan distance</span><div class="bar-track"><div class="bar" style="width:7.3%"></div></div><span class="bar-value">0.81%</span></div>
           <div class="bar-row"><span class="bar-label">Gallery · 5 known sessions/cow</span><div class="bar-track"><div class="bar" style="width:21.8%"></div></div><span class="bar-value">2.42%</span></div>
@@ -707,7 +707,7 @@
           <div class="bar-row"><span class="bar-label">50 sessions per cow</span><div class="bar-track"><div class="bar" style="width:86.2%"></div></div><span class="bar-value">9.60%</span></div>
           <div class="bar-row"><span class="bar-label">75 sessions per cow</span><div class="bar-track"><div class="bar" style="width:95.5%"></div></div><span class="bar-value">10.63%</span></div>
           <div class="bar-row"><span class="bar-label">100 sessions per cow · best fixed-distance</span><div class="bar-track"><div class="bar best" style="width:100%"></div></div><span class="bar-value">11.13%</span></div>
-          <p class="chart-note">Date plus measurements raised exact accuracy 3.81% → 4.88%; date alone was ineffective. Adding reproductive status and derived features raised it further to 7.90%. A larger gallery then helped incrementally.</p>
+          <p class="chart-note">Date plus measurements raised exact accuracy 3.81% → 4.88%; date alone was ineffective. Adding reproductive status and derived features raised it further to 7.90%. A [...]</p>
         </div>
 
         <div>
@@ -717,8 +717,8 @@
             <div><span>Standardized nearest neighbors</span><strong>18%</strong><small>39% in distinct-cow top five</small></div>
             <div class="winner"><span>NCA learned distance · tuned</span><strong>22.86%</strong><small>51.89% in distinct-cow top five</small></div>
           </div>
-          <p>NCA learned a feature transformation before nearest-neighbor retrieval. The 27-run sweep tested 4, 6, or 8 components; 50, 100, or 300 iterations; and auto, PCA, or identity initialization.</p>
-          <p><strong>Best tuned configuration:</strong> 6 components, 100 iterations, auto initialization. NCA beat the standardized-distance baseline by about 4.9 percentage points exact and 12.9 points top-five.</p>
+          <p>NCA learned a feature transformation before nearest-neighbor retrieval. The 27-run sweep tested 4, 6, or 8 components; 50, 100, or 300 iterations; and auto, PCA, or identity initializatio[...]</p>
+          <p><strong>Best tuned configuration:</strong> 6 components, 100 iterations, auto initialization. NCA beat the standardized-distance baseline by about 4.9 percentage points exact and 12.9 poi[...]</p>
           <div class="callout"><strong>Interpretation:</strong> stronger candidate ranking is a real improvement, but roughly 77% of pilot queries still did not get the exact top-1 cow.</div>
         </div>
 
@@ -753,7 +753,7 @@
     <section class="takeaway no-break">
       <div>
         <h2>Bottom line</h2>
-        <p>Cleaning removed exact duplicates and made types consistent without fabricating missing IDs or discarding valid-looking sessions. Leakage-aware splits made the behavior-group result credible. For exact cow assignment, more labeled sessions and NCA improved ranking—but accuracy is not yet sufficient to automatically fill missing AnimalId values.</p>
+        <p>Cleaning removed exact duplicates and made types consistent without fabricating missing IDs or discarding valid-looking sessions. Leakage-aware splits made the behavior-group result credibl[...]</p>
       </div>
       <div class="takeaway-stat"><strong>22.86%</strong><span>best tuned NCA exact match<br>pilot: 2,463 queries · 499 cows</span></div>
     </section>
