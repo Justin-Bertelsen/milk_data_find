@@ -1,0 +1,767 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>From Data Cleaning to Animal-ID Matching | ANSC 6040</title>
+  <style>
+    :root {
+      --navy: #123b67;
+      --blue: #21618c;
+      --teal: #168b91;
+      --green: #2d806c;
+      --orange: #df812c;
+      --red: #bd5b4d;
+      --ink: #1b2b3a;
+      --muted: #526477;
+      --line: #d8e2e9;
+      --paper: #f3f6f8;
+      --white: #fff;
+      --pale-blue: #eaf2f8;
+      --pale-green: #eaf5f1;
+      --pale-orange: #fff2e3;
+      --pale-red: #fff0ed;
+    }
+
+    @page {
+      size: 24in 36in;
+      margin: 0;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      color: var(--ink);
+      background: #dce4e9;
+      font-family: "Segoe UI", Arial, sans-serif;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    body { padding: 24px; }
+
+    .poster {
+      width: 24in;
+      min-height: 36in;
+      margin: 0 auto;
+      padding: 0.56in 0.64in 0.48in;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 95% 8%, rgba(22,139,145,.09), transparent 18%),
+        var(--paper);
+      display: flex;
+      flex-direction: column;
+      gap: 0.2in;
+      box-shadow: 0 14px 40px rgba(22, 42, 58, .2);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 0.42in 0.5in 0.38in;
+      color: var(--white);
+      background: linear-gradient(115deg, #103863 0%, #155c83 63%, #147e83 100%);
+      border-radius: 22px;
+    }
+
+    .hero:after {
+      position: absolute;
+      right: -0.2in;
+      top: -1.2in;
+      width: 6.5in;
+      height: 6.5in;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 50%;
+      content: "";
+      box-shadow: 0 0 0 0.55in rgba(255,255,255,.035),
+                  0 0 0 1.1in rgba(255,255,255,.025);
+    }
+
+    .eyebrow {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 0.1in;
+      color: #bde5e7;
+      font-size: 15pt;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      position: relative;
+      z-index: 1;
+      max-width: 19in;
+      margin: 0;
+      font-size: 36pt;
+      line-height: 1.08;
+      letter-spacing: -.6px;
+    }
+
+    .subtitle {
+      position: relative;
+      z-index: 1;
+      max-width: 18in;
+      margin: 0.16in 0 0;
+      color: #e0edf5;
+      font-size: 17pt;
+      line-height: 1.35;
+    }
+
+    .hero-bottom {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.3in;
+      margin-top: 0.24in;
+      padding-top: 0.18in;
+      border-top: 1px solid rgba(255,255,255,.25);
+      color: #d5e5ee;
+      font-size: 12.5pt;
+    }
+
+    .headline {
+      max-width: 14in;
+      font-weight: 700;
+    }
+
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.16in;
+    }
+
+    .metric {
+      min-height: 1.12in;
+      padding: 0.16in 0.21in;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 3px 10px rgba(29, 57, 76, .045);
+    }
+
+    .metric strong {
+      display: block;
+      color: var(--navy);
+      font-size: 26pt;
+      line-height: 1;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 0.09in;
+      color: var(--muted);
+      font-size: 12pt;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      align-items: stretch;
+      gap: 0.19in;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 0.17in;
+      min-width: 0;
+    }
+
+    .card {
+      padding: 0.22in 0.24in;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      box-shadow: 0 3px 10px rgba(29, 57, 76, .04);
+    }
+
+    .card h2 {
+      display: flex;
+      align-items: center;
+      gap: 0.1in;
+      margin: 0 0 0.14in;
+      color: var(--navy);
+      font-size: 19pt;
+      line-height: 1.15;
+    }
+
+    .card h3 {
+      margin: 0 0 0.07in;
+      color: var(--ink);
+      font-size: 13pt;
+      line-height: 1.2;
+    }
+
+    p, li {
+      font-size: 11.4pt;
+      line-height: 1.33;
+    }
+
+    p { margin: 0.06in 0 0.1in; }
+    ul, ol { margin: 0.05in 0 0; padding-left: 0.22in; }
+    li { margin: 0 0 0.065in; padding-left: 0.02in; }
+    strong { color: #193b5b; }
+
+    .tag {
+      display: inline-block;
+      margin: 0 0.045in 0.035in 0;
+      padding: 0.035in 0.085in;
+      color: var(--blue);
+      background: var(--pale-blue);
+      border-radius: 999px;
+      font-size: 9.2pt;
+      font-weight: 800;
+      letter-spacing: .25px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .callout {
+      margin-top: 0.12in;
+      padding: 0.13in 0.15in;
+      border-left: 5px solid var(--teal);
+      border-radius: 5px;
+      background: var(--pale-blue);
+      font-size: 10.8pt;
+      line-height: 1.35;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: center;
+      gap: 0.07in;
+      margin: 0.15in 0;
+      padding: 0.13in;
+      border-radius: 11px;
+      background: #f2f7fa;
+    }
+
+    .flow-step {
+      text-align: center;
+      font-size: 9.5pt;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .flow-step strong {
+      display: block;
+      margin-bottom: 0.035in;
+      color: var(--teal);
+      font-size: 15pt;
+    }
+
+    .arrow {
+      color: #7f96a7;
+      font-size: 17pt;
+      font-weight: 800;
+    }
+
+    .mini-table {
+      width: 100%;
+      margin: 0.1in 0 0;
+      border-collapse: collapse;
+      font-size: 10.3pt;
+    }
+
+    .mini-table th, .mini-table td {
+      padding: 0.075in 0.06in;
+      text-align: left;
+      border-bottom: 1px solid #e6edf1;
+      vertical-align: top;
+    }
+
+    .mini-table th {
+      color: var(--muted);
+      font-size: 9pt;
+      letter-spacing: .35px;
+      text-transform: uppercase;
+    }
+
+    .mini-table td:last-child,
+    .mini-table th:last-child {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .split-tile {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.08in;
+      margin: 0.12in 0;
+    }
+
+    .split-tile div {
+      padding: 0.12in;
+      border-radius: 10px;
+      background: var(--pale-blue);
+    }
+
+    .split-tile strong {
+      display: block;
+      color: var(--navy);
+      font-size: 17pt;
+    }
+
+    .split-tile span {
+      display: block;
+      margin-top: 0.035in;
+      color: var(--muted);
+      font-size: 9.5pt;
+      font-weight: 650;
+      line-height: 1.2;
+    }
+
+    .success {
+      background: var(--pale-green);
+      border-color: #c6e3d8;
+    }
+
+    .success h2 { color: #206c59; }
+
+    .caution {
+      background: var(--pale-orange);
+      border-color: #f0d9bb;
+    }
+
+    .caution h2 { color: #95550e; }
+
+    .failure {
+      background: var(--pale-red);
+      border-color: #f0d0c9;
+    }
+
+    .failure h2 { color: #a1473e; }
+
+    .result-badge {
+      display: inline-block;
+      margin: 0.04in 0.04in 0 0;
+      padding: 0.06in 0.09in;
+      border-radius: 7px;
+      background: var(--white);
+      color: var(--ink);
+      font-size: 10.5pt;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .wide-card { padding: 0.22in 0.28in; }
+
+    .wide-grid {
+      display: grid;
+      grid-template-columns: 1.42fr .9fr .82fr;
+      gap: 0.22in;
+      align-items: start;
+    }
+
+    .chart-title {
+      margin: 0 0 0.07in;
+      color: var(--navy);
+      font-size: 14pt;
+      font-weight: 800;
+    }
+
+    .chart-note {
+      margin: 0 0 0.12in;
+      color: var(--muted);
+      font-size: 9.3pt;
+      line-height: 1.3;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 2.48in 1fr 0.55in;
+      align-items: center;
+      gap: 0.09in;
+      margin: 0 0 0.075in;
+      font-size: 9.7pt;
+      line-height: 1.1;
+    }
+
+    .bar-label { color: #344b5e; }
+
+    .bar-track {
+      height: 0.16in;
+      overflow: hidden;
+      border-radius: 99px;
+      background: #e8eef2;
+    }
+
+    .bar {
+      height: 100%;
+      min-width: 3px;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #65b9c1, #178c93);
+    }
+
+    .bar.best { background: linear-gradient(90deg, #f0af5e, #dc7b26); }
+    .bar-value { color: var(--ink); font-weight: 800; text-align: right; }
+
+    .step-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.09in;
+      margin: 0.17in 0 0.1in;
+      color: #4c6374;
+      font-size: 9.3pt;
+      font-weight: 800;
+      letter-spacing: .45px;
+      text-transform: uppercase;
+    }
+
+    .step-divider:after {
+      height: 1px;
+      flex: 1;
+      background: var(--line);
+      content: "";
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.08in;
+      margin: 0.11in 0;
+    }
+
+    .compare div {
+      padding: 0.12in;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f8fafb;
+    }
+
+    .compare .winner {
+      border-color: #b9dcd0;
+      background: var(--pale-green);
+    }
+
+    .compare span {
+      display: block;
+      color: var(--muted);
+      font-size: 9.4pt;
+      font-weight: 750;
+      line-height: 1.2;
+    }
+
+    .compare strong {
+      display: block;
+      margin-top: 0.07in;
+      color: var(--navy);
+      font-size: 23pt;
+      line-height: 1;
+    }
+
+    .compare small {
+      display: block;
+      margin-top: 0.055in;
+      color: var(--muted);
+      font-size: 9.8pt;
+      font-weight: 650;
+    }
+
+    .outcome-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.08in;
+    }
+
+    .outcome {
+      padding: 0.12in 0.14in;
+      border-radius: 9px;
+      background: #f5f8fa;
+      border-left: 4px solid var(--teal);
+    }
+
+    .outcome.weak { border-left-color: var(--orange); }
+
+    .outcome strong {
+      display: block;
+      margin-bottom: 0.03in;
+      font-size: 10.2pt;
+    }
+
+    .outcome span {
+      display: block;
+      color: #405468;
+      font-size: 9.6pt;
+      line-height: 1.3;
+    }
+
+    .takeaway {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 0.3in;
+      padding: 0.21in 0.29in;
+      color: var(--white);
+      background: linear-gradient(110deg, #123b67, #177c82);
+      border-radius: 15px;
+    }
+
+    .takeaway h2 {
+      margin: 0 0 0.05in;
+      color: var(--white);
+      font-size: 18pt;
+    }
+
+    .takeaway p {
+      max-width: 17in;
+      margin: 0;
+      color: #e3f0f2;
+      font-size: 12pt;
+      line-height: 1.34;
+    }
+
+    .takeaway-stat {
+      min-width: 2.35in;
+      padding-left: 0.25in;
+      border-left: 1px solid rgba(255,255,255,.35);
+      text-align: center;
+    }
+
+    .takeaway-stat strong {
+      display: block;
+      color: #fff;
+      font-size: 28pt;
+      line-height: 1;
+    }
+
+    .takeaway-stat span {
+      display: block;
+      margin-top: 0.07in;
+      color: #d7eeef;
+      font-size: 10pt;
+      font-weight: 700;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.2in;
+      padding: 0.025in 0.04in;
+      color: #637485;
+      font-size: 9.2pt;
+      line-height: 1.25;
+    }
+
+    .no-break { break-inside: avoid; }
+
+    @media screen {
+      .poster { min-height: 36in; }
+    }
+
+    @media print {
+      html, body { background: #fff; }
+      body { padding: 0; }
+      .poster {
+        min-height: 36in;
+        margin: 0;
+        box-shadow: none;
+      }
+      .card, .metric, .hero, .takeaway { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main class="poster">
+    <header class="hero">
+      <p class="eyebrow">ANSC 6040 · Dairy-session data · Project 1</p>
+      <h1>From Data Cleaning to Animal-ID Matching</h1>
+      <p class="subtitle">A leakage-aware evaluation of what milking-session records can—and cannot—tell us about an individual cow.</p>
+      <div class="hero-bottom">
+        <span class="headline">Main finding: consistent data and better matching features improved retrieval, but the strongest ID result is still a pilot—not reliable automatic assignment.</span>
+        <span>Analysis notebook · Fall 2026</span>
+      </div>
+    </header>
+
+    <section class="metric-strip" aria-label="Dataset summary">
+      <div class="metric"><strong>8.50M</strong><span>raw milking-session rows</span></div>
+      <div class="metric"><strong>60,653</strong><span>exact duplicate rows removed</span></div>
+      <div class="metric"><strong>20.02%</strong><span>raw records missing AnimalId</span></div>
+      <div class="metric"><strong>9,087</strong><span>known cow IDs before splitting</span></div>
+    </section>
+
+    <section class="columns">
+      <div class="column">
+        <article class="card no-break">
+          <h2>1 · Clean and audit</h2>
+          <p><span class="tag">8,495,421 × 11</span> The CSV contains animal/lactation metadata, event date, flow, yield, duration, and milking number.</p>
+          <div class="flow" aria-label="Cleaning row counts">
+            <div class="flow-step"><strong>8,495,421</strong>raw rows</div>
+            <div class="arrow">−</div>
+            <div class="flow-step"><strong>60,653</strong>exact full-row duplicates</div>
+            <div class="arrow">=</div>
+            <div class="flow-step"><strong>8,434,768</strong>rows retained</div>
+          </div>
+          <ol>
+            <li><strong>Preserved AnimalId as text</strong> so large identifier values were not treated as measurements.</li>
+            <li><strong>Standardized types:</strong> coerced numeric fields to numeric, parsed EventDate as a date, and trimmed ReproductionStatus; blank text was marked missing.</li>
+            <li><strong>Removed exact duplicates only:</strong> rows had to match in every column; repeated AnimalId values were expected and retained.</li>
+            <li><strong>Checked impossible values:</strong> nonpositive lactation/milking numbers and negative days, flows, yields, or duration. The audit found <strong>0 violations</strong>, so 0 rows were removed by these rules.</li>
+            <li><strong>Reviewed duplicate-like session keys</strong> (same cow/date/milking) but kept them for review rather than deleting records on a partial key.</li>
+          </ol>
+          <div class="callout"><strong>Outlier and missing-data policy:</strong> the recorded cleaning run does not show statistical outlier trimming or imputation. The 1,696,870 rows with missing AnimalId were retained separately; an unknown cow ID is not a zero or a safe value to invent.</div>
+        </article>
+
+        <article class="card no-break">
+          <h2>2 · What was missing?</h2>
+          <p>Missingness was concentrated in cow/lactation metadata. Most session measurements and all event dates were populated in the raw-file audit.</p>
+          <table class="mini-table">
+            <thead><tr><th>Raw field</th><th>Missing rows</th><th>Share</th></tr></thead>
+            <tbody>
+              <tr><td>AnimalId</td><td>1,701,003</td><td>20.02%</td></tr>
+              <tr><td>LactationNumber</td><td>1,701,003</td><td>20.02%</td></tr>
+              <tr><td>DaysInMilk</td><td>1,701,007</td><td>20.02%</td></tr>
+              <tr><td>ReproductionStatus</td><td>1,701,003</td><td>20.02%</td></tr>
+              <tr><td>Avgmilkflow</td><td>172</td><td>&lt;0.01%</td></tr>
+              <tr><td>EventDate / other session measures</td><td>0</td><td>0%</td></tr>
+            </tbody>
+          </table>
+          <p class="chart-note">Counts above are from the raw 8.50M-row audit; after exact deduplication, 1,696,870 rows remained without AnimalId.</p>
+        </article>
+      </div>
+
+      <div class="column">
+        <article class="card no-break">
+          <h2>3 · Split without cow leakage</h2>
+          <p>All sessions from one known cow stayed together in the primary train/test partition. This prevents the same cow from appearing in both partitions when testing behavior-group generalization.</p>
+          <div class="split-tile">
+            <div><strong>80% · 7,270 cows</strong><span>training IDs · 5,396,948 rows</span></div>
+            <div><strong>20% · 1,817 cows</strong><span>held-out IDs · 1,340,950 rows</span></div>
+          </div>
+          <ul>
+            <li>Split unique known AnimalId values with <strong>random_state=42</strong>.</li>
+            <li>Confirmed <strong>0 shared cow IDs</strong> between train and test.</li>
+            <li>Kept the <strong>1,696,870 missing-ID rows</strong> as a separate inference pool, not as training labels.</li>
+          </ul>
+          <div class="callout"><strong>A second split served the matching task:</strong> within known cows, session keys were deterministically hashed and roughly 1-in-5 sessions held out as queries; the other sessions formed the cow profile/gallery. Gallery and query sessions were distinct.</div>
+        </article>
+
+        <article class="card success no-break">
+          <h2>Success · Broad behavior groups</h2>
+          <p>This is a <strong>3-class behavior classification</strong> task, not exact cow identification. Three cow groups were described using mean milk flow, session yield, and duration; KNN used those session measurements.</p>
+          <div>
+            <span class="result-badge">k = 9 selected</span>
+            <span class="result-badge">66.51% test accuracy</span>
+            <span class="result-badge">62.72% balanced accuracy</span>
+          </div>
+          <p>The held-out majority-class baseline was <strong>43.38%</strong>. The KNN improved on it; class-level F1 ranged from 0.47 to 0.74, showing the groups were not equally easy to recognize.</p>
+          <p class="chart-note">k was selected by inner validation (tested 1, 3, 5, 9); k=9 led with 68% accuracy / 64% balanced accuracy there. Final held-out evaluation used 8,907 sampled sessions from 1,807 cows.</p>
+        </article>
+
+        <article class="card caution no-break">
+          <h2>What the split lets us claim</h2>
+          <p>The cow-level holdout supports evaluation of broad behavior groups on cows not used to fit group centers. The individual-ID retrieval tests answer a different question: can a session match one of the cows that already has a labeled history?</p>
+          <p><strong>Neither task validates the true IDs of the missing-ID records</strong>, because those labels are unavailable for scoring.</p>
+        </article>
+      </div>
+
+      <div class="column">
+        <article class="card no-break">
+          <h2>4 · Predicting an exact AnimalId</h2>
+          <p>Nearest-neighbor retrieval compares a query session with known cow profiles/sessions. Exact accuracy means the top-ranked candidate ID is correct; top-five means the true cow appears among five distinct candidates.</p>
+          <p><span class="tag">8 numeric session features</span> lactation, days in milk, two flow measures, early and total yield, duration, and milking number.</p>
+          <ul>
+            <li>Standardized measurements so large-unit features would not dominate distance.</li>
+            <li>Tested Manhattan/Euclidean-style distances and feature subsets.</li>
+            <li>Added timing, reproductive status, and four derived production-shape features.</li>
+            <li>Expanded the gallery from 5–20 to as many as 100 sessions per cow.</li>
+          </ul>
+        </article>
+
+        <article class="card failure no-break">
+          <h2>Weak attempts · What did not help</h2>
+          <ul>
+            <li><strong>Simple profile matching:</strong> 0.79% exact accuracy; top-five coverage 2.11%.</li>
+            <li><strong>Changing the distance alone:</strong> all-feature Manhattan reached only 0.81%; production-only/context subsets were about 0.18–0.71%.</li>
+            <li><strong>Five-session majority vote:</strong> 0.46% exact accuracy, below the 0.79% single-session baseline. Repeated guesses did not reliably fix the match.</li>
+            <li><strong>Date alone:</strong> 0.014% exact accuracy and 0.13% top-five; timing needs measurement context.</li>
+            <li><strong>NCA sweep:</strong> 27 configurations tested. Tuning did not beat the simple NCA result materially; the best tuned run was 22.86% exact.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="card wide-card no-break">
+      <h2>5 · Accuracy experiments: useful gains, important limits</h2>
+      <div class="wide-grid">
+        <div>
+          <p class="chart-title">Exact ID retrieval on the larger query sample</p>
+          <p class="chart-note">The sequence below tracks the notebook's fixed-distance experiments on the same query sample (35,582 sessions; up to five query sessions per cow). Gallery and feature additions are cumulative where shown.</p>
+          <div class="bar-row"><span class="bar-label">Single-session profile · baseline</span><div class="bar-track"><div class="bar" style="width:7.1%"></div></div><span class="bar-value">0.79%</span></div>
+          <div class="bar-row"><span class="bar-label">All features · Manhattan distance</span><div class="bar-track"><div class="bar" style="width:7.3%"></div></div><span class="bar-value">0.81%</span></div>
+          <div class="bar-row"><span class="bar-label">Gallery · 5 known sessions/cow</span><div class="bar-track"><div class="bar" style="width:21.8%"></div></div><span class="bar-value">2.42%</span></div>
+          <div class="bar-row"><span class="bar-label">Gallery · 10 sessions/cow</span><div class="bar-track"><div class="bar" style="width:27.3%"></div></div><span class="bar-value">3.04%</span></div>
+          <div class="bar-row"><span class="bar-label">Gallery · 20 sessions/cow</span><div class="bar-track"><div class="bar" style="width:33.9%"></div></div><span class="bar-value">3.77%</span></div>
+          <div class="bar-row"><span class="bar-label">+ date-derived features</span><div class="bar-track"><div class="bar" style="width:43.9%"></div></div><span class="bar-value">4.88%</span></div>
+          <div class="bar-row"><span class="bar-label">+ ReproductionStatus</span><div class="bar-track"><div class="bar" style="width:61.3%"></div></div><span class="bar-value">6.82%</span></div>
+          <div class="bar-row"><span class="bar-label">+ four derived features</span><div class="bar-track"><div class="bar" style="width:71.0%"></div></div><span class="bar-value">7.90%</span></div>
+          <div class="step-divider">Richer model · enlarge gallery</div>
+          <div class="bar-row"><span class="bar-label">30 sessions per cow</span><div class="bar-track"><div class="bar" style="width:76.2%"></div></div><span class="bar-value">8.48%</span></div>
+          <div class="bar-row"><span class="bar-label">50 sessions per cow</span><div class="bar-track"><div class="bar" style="width:86.2%"></div></div><span class="bar-value">9.60%</span></div>
+          <div class="bar-row"><span class="bar-label">75 sessions per cow</span><div class="bar-track"><div class="bar" style="width:95.5%"></div></div><span class="bar-value">10.63%</span></div>
+          <div class="bar-row"><span class="bar-label">100 sessions per cow · best fixed-distance</span><div class="bar-track"><div class="bar best" style="width:100%"></div></div><span class="bar-value">11.13%</span></div>
+          <p class="chart-note">Date plus measurements raised exact accuracy 3.81% → 4.88%; date alone was ineffective. Adding reproductive status and derived features raised it further to 7.90%. A larger gallery then helped incrementally.</p>
+        </div>
+
+        <div>
+          <p class="chart-title">Controlled NCA pilot</p>
+          <p class="chart-note">Same 2,463 held-out sessions and same 499-cow candidate set for both models. This is a smaller pilot than the larger-sample progression at left.</p>
+          <div class="compare">
+            <div><span>Standardized nearest neighbors</span><strong>18%</strong><small>39% in distinct-cow top five</small></div>
+            <div class="winner"><span>NCA learned distance · tuned</span><strong>22.86%</strong><small>51.89% in distinct-cow top five</small></div>
+          </div>
+          <p>NCA learned a feature transformation before nearest-neighbor retrieval. The 27-run sweep tested 4, 6, or 8 components; 50, 100, or 300 iterations; and auto, PCA, or identity initialization.</p>
+          <p><strong>Best tuned configuration:</strong> 6 components, 100 iterations, auto initialization. NCA beat the standardized-distance baseline by about 4.9 percentage points exact and 12.9 points top-five.</p>
+          <div class="callout"><strong>Interpretation:</strong> stronger candidate ranking is a real improvement, but roughly 77% of pilot queries still did not get the exact top-1 cow.</div>
+        </div>
+
+        <div>
+          <p class="chart-title">Keep the outcomes separate</p>
+          <div class="outcome-list">
+            <div class="outcome">
+              <strong>Worked: broad behavior classification</strong>
+              <span>66.51% accuracy vs 43.38% majority baseline; predicts one of three behavior groups, not a cow's unique ID.</span>
+            </div>
+            <div class="outcome">
+              <strong>Helped: more session evidence</strong>
+              <span>With richer features, growing the cow gallery to 100 sessions raised exact retrieval to 11.13%.</span>
+            </div>
+            <div class="outcome">
+              <strong>Helped: learned distance (pilot)</strong>
+              <span>NCA increased exact and distinct-cow top-five performance over standardized nearest neighbors on the same pilot queries.</span>
+            </div>
+            <div class="outcome weak">
+              <strong>Did not solve: unique ID from one record</strong>
+              <span>Feature/distance tweaks alone barely moved the larger-sample baseline; majority voting and date-only matching performed poorly.</span>
+            </div>
+            <div class="outcome weak">
+              <strong>Still unknown: missing-ID truth</strong>
+              <span>The 20.02% unassigned records cannot be validated without their true IDs. A cow with no known labeled gallery session is not identifiable by this approach.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="takeaway no-break">
+      <div>
+        <h2>Bottom line</h2>
+        <p>Cleaning removed exact duplicates and made types consistent without fabricating missing IDs or discarding valid-looking sessions. Leakage-aware splits made the behavior-group result credible. For exact cow assignment, more labeled sessions and NCA improved ranking—but accuracy is not yet sufficient to automatically fill missing AnimalId values.</p>
+      </div>
+      <div class="takeaway-stat"><strong>22.86%</strong><span>best tuned NCA exact match<br>pilot: 2,463 queries · 499 cows</span></div>
+    </section>
+
+    <footer>
+      <span>Source: project_1_ANSC_4040_analysis.ipynb and its recorded outputs. Values are reported as evaluated; the larger retrieval experiments and NCA pilot use different sample sizes.</span>
+      <span>ANSC 6040 · Animal ID identification analysis</span>
+    </footer>
+  </main>
+</body>
+</html>

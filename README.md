@@ -130,3 +130,7 @@ The project will be considered successful when it produces a documented and repe
 5. Clearly identifies uncertain cases for manual review.
 
 If the results are reliable, then we can shout hooray!
+
+## Project 1 poster
+
+The data-cleaning, leakage-aware splitting, and accuracy experiments are summarized in the [Animal ID analysis poster](AnimalID_Data_Cleaning_and_Accuracy_Poster.pdf). The [editable HTML source](AnimalID_Data_Cleaning_and_Accuracy_Poster.html) is included alongside it.
