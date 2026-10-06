@@ -2,6 +2,12 @@
 
 Finding missing data from missing ID tags.
 
+## Presentation preview
+
+[**Preview the NCA Tuning Progress presentation in your browser**](https://justin-bertelsen.github.io/milk_data_find/) (no download needed). The original file is still available as [`NCA_Tuning_Progress.pptx`](NCA_Tuning_Progress.pptx).
+
+> The preview is served by GitHub Pages: enable it under Settings → Pages (deploy from the `main` branch, root folder).
+
 ## Project objective
 
 The goal of this project is to identify records with missing cow ID tags and assign the most likely cow IDs using the other available data, while keeping the process understandable, reproducible, and easy to validate.
