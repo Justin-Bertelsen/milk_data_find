@@ -4,7 +4,7 @@ Finding missing data from missing ID tags.
 
 ## Project objective
 
-The goal of this project is to identify records with missing cow ID tags and assign the most likely cow IDs using the other available data, while keeping the process understandable, reproducible, and easy to validate.
+The goal of this project is to identify records with missing cow ID tags and assign the most likely cow IDs using the other available data, while keeping the process understandable, reproducible, and auditable.
 
 ## Proposed timeline
 
@@ -12,19 +12,19 @@ This is an initial working timeline and can be refined during our Wednesday disc
 
 | Phase | Activities | Expected output | Target timing |
 |---|---|---|---|
-| 1. Understand the data | Inventory files, inspect columns and data types, identify missing IDs, review duplicate records, and understand how the data was collected. | Data dictionary and initial data-quality report | Before Wednesday |
-| 2. Standardize the data | Fix column names, units, date/time formats, categorical values, and naming conventions. Preserve the original values separately. | Clean, consistently formatted analysis dataset | Week 1 |
+| 1. Understand the data | Inventory files, inspect columns and data types, identify missing IDs, review duplicate records, and understand how the data was collected. | Data dictionary and initial data summary | Week 1 |
+| 2. Standardize the data | Fix column names, units, date/time formats, categorical values, and naming conventions. Preserve the original values separately. | Clean, consistently formatted analysis data | Week 1 |
 | 3. Establish data lineage | Record the source file, transformation, version, and row-level or batch-level changes made during cleaning. | Reproducible transformation notes and lineage log | Week 1 |
-| 4. Explore patterns | Calculate descriptive statistics and visualize milk yield and the other available factors by known cow ID, date, and relevant grouping variables. | Exploratory analysis and plausible value ranges for each cow | Week 2 |
-| 5. Build candidate matching approaches | Start with a rules- and distance-based baseline, then evaluate statistical or machine-learning approaches if they add value. | Baseline matcher and candidate cow IDs with confidence scores | Week 2–3 |
-| 6. Test and validate | Hide IDs from known records, run the matching process, compare predictions with the true IDs, and inspect ambiguous and incorrect matches. | Validation metrics, error analysis, and review samples | Week 3 |
-| 7. Refine and document | Tune thresholds, resolve data-quality issues, document limitations, and produce the final output with an audit trail. | Final matched dataset, documentation, and recommendations | Week 4 |
+| 4. Explore patterns | Calculate descriptive statistics and visualize milk yield and the other available factors by known cow ID, date, and relevant grouping variables. | Exploratory analysis and plots | Week 2 |
+| 5. Build candidate matching approaches | Start with a rules- and distance-based baseline, then evaluate statistical or machine-learning approaches if they add value. | Baseline matcher and candidate ranking method | Week 2 |
+| 6. Test and validate | Hide IDs from known records, run the matching process, compare predictions with the true IDs, and inspect ambiguous and incorrect matches. | Validation metrics, error analysis, and tuning notes | Week 3 |
+| 7. Refine and document | Tune thresholds, resolve data-quality issues, document limitations, and produce the final output with an audit trail. | Final matched dataset, documentation, and recommendations | Week 3 |
 
 ## Working environment
 
-The initial plan is to work **locally** so that the raw farm data remains under our control and the analysis can be run quickly while the approach is being developed. The primary IDE will be **Visual Studio Code**, using a Python environment and notebooks for exploration. Scripts will be used for repeatable cleaning and matching steps.
+The initial plan is to work **locally** so that the raw farm data remains under our control and the analysis can be run quickly while the approach is being developed. The primary IDE will be **Visual Studio Code**.
 
-If the dataset becomes too large for the local machine, or if collaboration and scheduled runs become important, the project can be moved to a cloud environment such as **GitHub Codespaces** or a managed notebook platform. The code and environment configuration should be kept portable so that moving to the cloud does not change the analysis.
+If the dataset becomes too large for the local machine, or if collaboration and scheduled runs become important, the project can be moved to a cloud environment such as **GitHub Codespaces** or a managed notebook platform.
 
 ## Strategy brainstorm
 
@@ -40,7 +40,7 @@ Before selecting a model, I will determine which fields are reliable and which a
 - Feed, health, or management information
 - Any location, equipment, or sequence information
 
-I will also check whether the same cow appears multiple times and whether measurements are recorded at a regular frequency. This will help prevent us from treating repeated observations as independent evidence when they are not.
+I will also check whether the same cow appears multiple times and whether measurements are recorded at a regular frequency. This will help prevent us from treating repeated observations as independent.
 
 ### 2. Create a reproducible data-cleaning process
 
@@ -57,7 +57,7 @@ Every output should be traceable back to its source file and original row wherev
 
 ### 3. Begin with an interpretable baseline
 
-The first matching method should be simple and explainable rather than immediately using a complex model. For each record with a missing ID, I will compare its available measurements with records that have known IDs and generate a ranked list of candidate cows.
+The first matching method should be simple and explainable rather than immediately using a complex model. For each record with a missing ID, I will compare its available measurements with records that do have IDs and look for the closest likely match.
 
 Possible baseline methods include:
 
@@ -90,11 +90,11 @@ Because the true answer is unknown for the missing records, testing will use rec
 4. Repeat this using multiple splits or time-based holdouts.
 5. Review errors, especially cases where the model was highly confident but wrong.
 
-Potential measures include top-1 accuracy, top-3 candidate coverage, precision at the selected confidence threshold, confusion between similar cows, and the percentage of records left unresolved. A time-based split may be particularly important if future records are meant to be matched using historical data.
+Potential measures include top-1 accuracy, top-3 candidate coverage, precision at the selected confidence threshold, confusion between similar cows, and the percentage of records left unresolved. A threshold should be chosen based on how much error is acceptable.
 
 ### 6. Manage uncertainty and manual review
 
-Not every record should be forced into a cow ID. Records with weak evidence, conflicting fields, or nearly tied candidate scores should be marked for manual review or left unresolved. The output should distinguish among:
+Not every record should be forced into a cow ID. Records with weak evidence, conflicting fields, or nearly tied candidate scores should be marked for manual review or left unresolved. The output should distinguish between:
 
 - High-confidence automatic matches
 - Lower-confidence suggested matches
@@ -133,4 +133,10 @@ If the results are reliable, then we can shout hooray!
 
 ## Project 1 poster
 
-The data-cleaning, leakage-aware splitting, and accuracy experiments are summarized in the [Animal ID analysis poster](AnimalID_Data_Cleaning_and_Accuracy_Poster.pdf). The [editable HTML source](AnimalID_Data_Cleaning_and_Accuracy_Poster.html) is included alongside it.
+The data-cleaning, leakage-aware splitting, and accuracy experiments are summarized in the [Animal ID analysis poster](AnimalID_Data_Cleaning_and_Accuracy_Poster.pdf). The [editable HTML source](AnimalID_Data_Cleaning_and_Accuracy_Poster.html) is also included.
+
+## Model evaluation
+
+![Model Evaluation](model_evaluation.png)
+
+Accuracy when my model was tested against the true data without missing variables.
